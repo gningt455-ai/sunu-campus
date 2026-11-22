@@ -3,21 +3,26 @@ import { redirect } from "next/navigation";
 import EnTete from "@/components/EnTete";
 import CarteAnnonce, { type ResumeAnnonce } from "@/components/CarteAnnonce";
 import { lireSession } from "@/lib/session";
+import { estUuid } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-type Filtres = Promise<{ categorie?: string; q?: string }>;
+type Filtres = Promise<{ categorie?: string; q?: string; lieu?: string }>;
 
 export default async function Annonces({ searchParams }: { searchParams: Filtres }) {
   const { supabase, user, profil } = await lireSession();
   if (!user || !profil) redirect("/connexion");
   if (profil.statut === "bloque") redirect("/attente");
 
-  const { categorie, q } = await searchParams;
+  const { categorie, q, lieu } = await searchParams;
   const recherche = (q ?? "").trim().slice(0, 60);
 
   const { data: categories } = await supabase.from("categories").select("id, slug, nom").order("ordre");
   const catActive = categories?.find((c) => c.slug === categorie);
+
+  // Filtre par lieu de rencontre (depuis la carte du campus)
+  const { data: lieuActif } =
+    lieu && estUuid(lieu) ? await supabase.from("lieux").select("id, nom").eq("id", lieu).maybeSingle() : { data: null };
 
   let requete = supabase
     .from("annonces")
@@ -27,6 +32,7 @@ export default async function Annonces({ searchParams }: { searchParams: Filtres
     .limit(60);
   if (catActive) requete = requete.eq("categorie_id", catActive.id);
   if (recherche) requete = requete.ilike("titre", `%${recherche}%`);
+  if (lieuActif) requete = requete.eq("lieu_id", lieuActif.id);
 
   const { data } = await requete;
   const annonces = (data ?? []) as unknown as ResumeAnnonce[];
@@ -47,6 +53,17 @@ export default async function Annonces({ searchParams }: { searchParams: Filtres
       <EnTete actif="annonces" peutPublier={profil.statut === "verifie"} />
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 px-4 py-5">
         <h1 className="text-2xl font-extrabold tracking-tight">Annonces</h1>
+
+        {lieuActif && (
+          <div className="flex items-center justify-between gap-3 rounded-xl bg-vert-clair px-4 py-3 text-sm text-vert-fonce">
+            <span>
+              À récupérer à : <strong>{lieuActif.nom}</strong>
+            </span>
+            <Link href="/annonces" className="font-bold underline">
+              Tous les lieux
+            </Link>
+          </div>
+        )}
 
         <form action="/annonces" className="flex gap-2">
           {catActive && <input type="hidden" name="categorie" value={catActive.slug} />}

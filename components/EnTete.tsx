@@ -3,7 +3,7 @@ import Logo from "@/components/Logo";
 import BadgeMessages from "@/components/BadgeMessages";
 import { createClient } from "@/lib/supabase/server";
 
-type Onglet = "accueil" | "annonces" | "messages";
+type Onglet = "accueil" | "annonces" | "campus" | "messages";
 
 // Barre du haut des pages connectées
 export default async function EnTete({ actif, peutPublier = true }: { actif?: Onglet; peutPublier?: boolean }) {
@@ -41,6 +41,7 @@ export default async function EnTete({ actif, peutPublier = true }: { actif?: On
           <span className="hidden sm:contents">
             {lien("/", "Accueil", "accueil")}
             {lien("/annonces", "Annonces", "annonces")}
+            {lien("/campus", "Campus", "campus")}
             {lien("/messages", "Messages", "messages")}
           </span>
           {peutPublier && (
@@ -60,6 +61,7 @@ export default async function EnTete({ actif, peutPublier = true }: { actif?: On
       <div className="mx-auto flex max-w-5xl gap-1 px-3 pb-2 sm:hidden">
         {lien("/", "Accueil", "accueil")}
         {lien("/annonces", "Annonces", "annonces")}
+        {lien("/campus", "Campus", "campus")}
         {lien("/messages", "Messages", "messages")}
       </div>
     </header>

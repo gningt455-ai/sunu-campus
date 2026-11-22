@@ -53,9 +53,15 @@ export default async function Admin() {
             ← Retour à l&apos;accueil
           </Link>
           <h1 className="text-2xl font-extrabold">Espace administrateur</h1>
-          <div className="w-fit rounded-xl bg-white px-4 py-3 text-encre">
-            <span className="block text-2xl font-extrabold">{demandes.length}</span>
-            <span className="text-xs font-semibold">Cartes à vérifier</span>
+          <div className="flex flex-wrap gap-3">
+            <div className="w-fit rounded-xl bg-white px-4 py-3 text-encre">
+              <span className="block text-2xl font-extrabold">{demandes.length}</span>
+              <span className="text-xs font-semibold">Cartes à vérifier</span>
+            </div>
+            <Link href="/admin/campus" className="flex w-fit flex-col justify-center rounded-xl border border-[#3a4a43] bg-[#24332c] px-4 py-3 text-white hover:bg-[#2c3d35]">
+              <span className="text-sm font-extrabold">Découvrir le campus →</span>
+              <span className="text-xs text-[#b8c4be]">Publier des histoires et des photos</span>
+            </Link>
           </div>
         </div>
       </header>

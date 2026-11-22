@@ -21,7 +21,7 @@ export default async function Accueil() {
             Achète, vends et trouve un logement entre étudiants de l&apos;UCAD.
           </h1>
           <p className="text-[15px] leading-relaxed text-gris">
-            Une plateforme réservée aux étudiants vérifiés : annonces, carte du campus, logements, messagerie et mur anonyme.
+            Une plateforme réservée aux étudiants vérifiés : annonces, logements, messagerie, mur anonyme et histoires du campus.
           </p>
         </div>
         <div className="flex flex-col gap-3">
@@ -81,6 +81,14 @@ export default async function Accueil() {
             </Link>
           ))}
         </div>
+
+        <Link href="/campus" className="flex items-center justify-between gap-4 rounded-2xl bg-encre p-5 text-white">
+          <span className="flex flex-col gap-1">
+            <span className="text-[11px] font-bold uppercase tracking-wide text-jaune">Découvrir le campus</span>
+            <span className="text-lg font-extrabold leading-snug">La beauté de l&apos;UCAD et du campus social, en photos et en histoires</span>
+          </span>
+          <span aria-hidden="true" className="text-2xl">→</span>
+        </Link>
 
         <section className="flex flex-col gap-3">
           <div className="flex items-baseline justify-between">

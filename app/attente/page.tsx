@@ -89,6 +89,11 @@ export default async function Attente() {
           Parcourir les annonces en attendant
         </Link>
       )}
+      {!bloque && (
+        <Link href="/campus" className="flex min-h-[52px] items-center justify-center rounded-xl bg-encre font-bold text-white">
+          Découvrir le campus
+        </Link>
+      )}
 
       <form action={deconnexion} className="mt-auto">
         <button type="submit" className="w-full py-3 text-sm font-semibold text-gris hover:text-encre">
