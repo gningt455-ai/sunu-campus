@@ -60,3 +60,11 @@ export async function signalerAnnonce(annonceId: string, formData: FormData) {
   if (error && error.code !== "23505") throw new Error(error.message);
   redirect(`/annonces/${annonceId}?signale=1`);
 }
+
+// Acheteur : ouvrir (ou retrouver) la conversation avec le vendeur
+export async function ouvrirConversation(annonceId: string) {
+  const { supabase } = await session();
+  const { data, error } = await supabase.rpc("ouvrir_conversation", { p_annonce_id: annonceId });
+  if (error) throw new Error(error.message);
+  redirect(`/messages/${data}`);
+}

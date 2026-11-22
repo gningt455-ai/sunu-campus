@@ -5,7 +5,7 @@ import { Alerte } from "@/components/Champ";
 import { lireSession } from "@/lib/session";
 import { estUuid, formatPrix, ilYa } from "@/lib/format";
 import { urlPhoto } from "@/lib/photos";
-import { basculerFavori, changerStatut, signalerAnnonce, supprimerAnnonce } from "./actions";
+import { basculerFavori, changerStatut, ouvrirConversation, signalerAnnonce, supprimerAnnonce } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -151,9 +151,20 @@ export default async function DetailAnnonce({
           ) : (
             <div className="flex flex-col gap-3">
               <div className="flex gap-2">
-                <button disabled className="min-h-[52px] flex-1 cursor-not-allowed rounded-xl bg-vert font-bold text-white opacity-60" title="La messagerie arrive bientôt">
-                  Envoyer un message · bientôt
-                </button>
+                {verifie ? (
+                  <form action={ouvrirConversation.bind(null, a.id)} className="flex-1">
+                    <button className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-vert font-bold text-white hover:bg-vert-fonce">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" />
+                      </svg>
+                      Envoyer un message
+                    </button>
+                  </form>
+                ) : (
+                  <button disabled className="min-h-[52px] flex-1 cursor-not-allowed rounded-xl bg-vert font-bold text-white opacity-60">
+                    Compte en attente de validation
+                  </button>
+                )}
                 {verifie && (
                   <form action={basculerFavori.bind(null, a.id)}>
                     <button

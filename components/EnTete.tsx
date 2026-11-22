@@ -1,15 +1,35 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import BadgeMessages from "@/components/BadgeMessages";
+import { createClient } from "@/lib/supabase/server";
+
+type Onglet = "accueil" | "annonces" | "messages";
 
 // Barre du haut des pages connectées
-export default function EnTete({ actif, peutPublier = true }: { actif?: "accueil" | "annonces"; peutPublier?: boolean }) {
-  const lien = (href: string, nom: string, cle: "accueil" | "annonces") => (
+export default async function EnTete({ actif, peutPublier = true }: { actif?: Onglet; peutPublier?: boolean }) {
+  // Nombre de messages reçus non lus (la sécurité RLS limite aux conversations de l'étudiant)
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let nonLus = 0;
+  if (user) {
+    const { count } = await supabase
+      .from("messages")
+      .select("id", { count: "exact", head: true })
+      .eq("lu", false)
+      .neq("expediteur_id", user.id);
+    nonLus = count ?? 0;
+  }
+
+  const lien = (href: string, nom: string, cle: Onglet) => (
     <Link
       href={href}
       aria-current={actif === cle ? "page" : undefined}
-      className={`rounded-lg px-3 py-2 text-sm font-semibold ${actif === cle ? "bg-vert-clair text-vert-fonce" : "text-gris hover:text-encre"}`}
+      className={`inline-flex items-center rounded-lg px-3 py-2 text-sm font-semibold ${actif === cle ? "bg-vert-clair text-vert-fonce" : "text-gris hover:text-encre"}`}
     >
       {nom}
+      {cle === "messages" && user && <BadgeMessages initial={nonLus} moi={user.id} />}
     </Link>
   );
 
@@ -21,6 +41,7 @@ export default function EnTete({ actif, peutPublier = true }: { actif?: "accueil
           <span className="hidden sm:contents">
             {lien("/", "Accueil", "accueil")}
             {lien("/annonces", "Annonces", "annonces")}
+            {lien("/messages", "Messages", "messages")}
           </span>
           {peutPublier && (
             <Link
@@ -39,6 +60,7 @@ export default function EnTete({ actif, peutPublier = true }: { actif?: "accueil
       <div className="mx-auto flex max-w-5xl gap-1 px-3 pb-2 sm:hidden">
         {lien("/", "Accueil", "accueil")}
         {lien("/annonces", "Annonces", "annonces")}
+        {lien("/messages", "Messages", "messages")}
       </div>
     </header>
   );
