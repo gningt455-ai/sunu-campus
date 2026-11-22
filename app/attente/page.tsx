@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import Logo from "@/components/Logo";
 import FormulaireCarte from "@/components/FormulaireCarte";
@@ -81,6 +82,12 @@ export default async function Attente() {
             <FormulaireCarte userId={user.id} libelle={refuse ? "Renvoyer ma carte" : "Envoyer ma carte"} />
           )}
         </>
+      )}
+
+      {!bloque && (
+        <Link href="/annonces" className="flex min-h-[52px] items-center justify-center rounded-xl border border-bord bg-white font-bold">
+          Parcourir les annonces en attendant
+        </Link>
       )}
 
       <form action={deconnexion} className="mt-auto">
