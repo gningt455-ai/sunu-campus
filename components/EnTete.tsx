@@ -23,6 +23,7 @@ export default async function EnTete({ actif, peutPublier = true }: { actif?: On
   const lien = (href: string, nom: string, cle: Onglet) => (
     <Link
       href={href}
+      prefetch
       aria-current={actif === cle ? "page" : undefined}
       className={`inline-flex flex-none items-center rounded-lg px-3 py-2 text-sm font-semibold ${actif === cle ? "bg-vert-clair text-vert-fonce" : "text-gris hover:text-encre"}`}
     >
