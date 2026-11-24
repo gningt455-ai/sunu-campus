@@ -46,6 +46,9 @@ export default function Connexion() {
       <form onSubmit={connecter} className="flex flex-col gap-4" noValidate>
         <Champ label="E-mail" name="email" type="email" autoComplete="email" placeholder="awa.diop@exemple.com" />
         <Champ label="Mot de passe" name="mot_de_passe" type="password" autoComplete="current-password" />
+        <Link href="/mot-de-passe-oublie" className="-mt-2 self-end text-[13px] font-semibold text-vert">
+          Mot de passe oublié ?
+        </Link>
         {erreur && <Alerte type="erreur">{erreur}</Alerte>}
         <Bouton type="submit" chargement={chargement}>
           Se connecter
