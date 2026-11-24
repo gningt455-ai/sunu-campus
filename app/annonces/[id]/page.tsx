@@ -52,18 +52,10 @@ export default async function DetailAnnonce({
   const estAMoi = a.auteur_id === user.id;
   const verifie = profil.statut === "verifie";
 
-  const { data: favori } = await supabase
-    .from("favoris")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("annonce_id", a.id)
-    .maybeSingle();
-
-  const { count: nbAnnoncesVendeur } = await supabase
-    .from("annonces")
-    .select("id", { count: "exact", head: true })
-    .eq("auteur_id", a.auteur_id)
-    .eq("statut", "en_ligne");
+  const [{ data: favori }, { count: nbAnnoncesVendeur }] = await Promise.all([
+    supabase.from("favoris").select("id").eq("user_id", user.id).eq("annonce_id", a.id).maybeSingle(),
+    supabase.from("annonces").select("id", { count: "exact", head: true }).eq("auteur_id", a.auteur_id).eq("statut", "en_ligne"),
+  ]);
 
   const initiales = `${a.profiles?.prenom?.[0] ?? ""}${a.profiles?.nom?.[0] ?? ""}`.toUpperCase();
 

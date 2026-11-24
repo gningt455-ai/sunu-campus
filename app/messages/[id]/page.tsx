@@ -11,11 +11,10 @@ type Personne = { prenom: string; nom: string; faculte: string | null } | null;
 type Conv = {
   id: string;
   annonce_id: string | null;
-  logement_id: string | null;
   demandeur_id: string;
   proprietaire_id: string;
   annonces: { id: string; titre: string; prix: number; photos: string[]; statut: string } | null;
-  logements: { id: string; titre: string; loyer: number; photos: string[] } | null;
+  objets: { id: string; titre: string; photo: string | null; statut: string; sens: string } | null;
   demandeur: Personne;
   proprietaire: Personne;
 };
@@ -31,7 +30,7 @@ export default async function PageConversation({ params }: { params: Promise<{ i
   const { data } = await supabase
     .from("conversations")
     .select(
-      "id, annonce_id, logement_id, demandeur_id, proprietaire_id, annonces(id, titre, prix, photos, statut), logements(id, titre, loyer, photos), demandeur:profiles!conversations_demandeur_id_fkey(prenom, nom, faculte), proprietaire:profiles!conversations_proprietaire_id_fkey(prenom, nom, faculte)"
+      "id, annonce_id, demandeur_id, proprietaire_id, annonces(id, titre, prix, photos, statut), objets(id, titre, photo, statut, sens), demandeur:profiles!conversations_demandeur_id_fkey(prenom, nom, faculte), proprietaire:profiles!conversations_proprietaire_id_fkey(prenom, nom, faculte)"
     )
     .eq("id", id)
     .maybeSingle();
@@ -49,8 +48,14 @@ export default async function PageConversation({ params }: { params: Promise<{ i
   const initiales = autre ? `${autre.prenom[0] ?? ""}${autre.nom[0] ?? ""}`.toUpperCase() : "?";
   const sujet = c.annonces
     ? { lien: `/annonces/${c.annonces.id}`, titre: c.annonces.titre, prix: formatPrix(c.annonces.prix), photo: c.annonces.photos[0], vendue: c.annonces.statut === "vendue" }
-    : c.logements
-      ? { lien: `/logements/${c.logements.id}`, titre: c.logements.titre, prix: `${formatPrix(c.logements.loyer)} / mois`, photo: c.logements.photos[0], vendue: false }
+    : c.objets
+      ? {
+          lien: `/objets/${c.objets.id}`,
+          titre: c.objets.titre,
+          prix: c.objets.sens === "trouve" ? "Objet trouvé" : "Objet perdu",
+          photo: c.objets.photo ?? undefined,
+          vendue: c.objets.statut === "rendu",
+        }
       : null;
 
   return (
@@ -82,7 +87,7 @@ export default async function PageConversation({ params }: { params: Promise<{ i
                 <span className="text-[13px] font-extrabold text-vert">{sujet.prix}</span>
               </span>
               <span className={`rounded-md px-2 py-1 text-[11px] font-bold ${sujet.vendue ? "bg-gris-clair text-gris" : "bg-vert-clair text-vert-fonce"}`}>
-                {sujet.vendue ? "Vendue" : "Disponible"}
+                {sujet.vendue ? (c.objets ? "Rendu" : "Vendue") : c.objets ? "En cours" : "Disponible"}
               </span>
             </Link>
           )}

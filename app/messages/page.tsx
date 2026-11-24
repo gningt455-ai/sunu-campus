@@ -14,7 +14,7 @@ type Conv = {
   proprietaire_id: string;
   dernier_message_le: string;
   annonces: { titre: string; photos: string[] } | null;
-  logements: { titre: string; photos: string[] } | null;
+  objets: { titre: string; photo: string | null } | null;
   demandeur: Personne;
   proprietaire: Personne;
 };
@@ -28,7 +28,7 @@ export default async function Messages() {
   const { data } = await supabase
     .from("conversations")
     .select(
-      "id, demandeur_id, proprietaire_id, dernier_message_le, annonces(titre, photos), logements(titre, photos), demandeur:profiles!conversations_demandeur_id_fkey(prenom, nom), proprietaire:profiles!conversations_proprietaire_id_fkey(prenom, nom)"
+      "id, demandeur_id, proprietaire_id, dernier_message_le, annonces(titre, photos), objets(titre, photo), demandeur:profiles!conversations_demandeur_id_fkey(prenom, nom), proprietaire:profiles!conversations_proprietaire_id_fkey(prenom, nom)"
     )
     .order("dernier_message_le", { ascending: false })
     .limit(100);
@@ -67,10 +67,14 @@ export default async function Messages() {
           <ul className="flex flex-col overflow-hidden rounded-2xl border border-[#e1e5e2] bg-white">
             {conversations.map((c) => {
               const autre = c.demandeur_id === user.id ? c.proprietaire : c.demandeur;
-              const sujet = c.annonces ?? c.logements;
+              const sujet = c.annonces
+                ? { titre: c.annonces.titre, photo: c.annonces.photos?.[0] }
+                : c.objets
+                  ? { titre: c.objets.titre, photo: c.objets.photo ?? undefined }
+                  : null;
               const dernier = derniers.get(c.id);
               const n = nonLus.get(c.id) ?? 0;
-              const photo = sujet?.photos?.[0];
+              const photo = sujet?.photo;
               return (
                 <li key={c.id} className="border-b border-[#eef0ee] last:border-b-0">
                   <Link href={`/messages/${c.id}`} className="flex items-center gap-3 p-3.5 hover:bg-fond">
@@ -87,7 +91,7 @@ export default async function Messages() {
                         </span>
                         <span className="flex-none text-[11px] text-gris">{ilYa(dernier?.created_at ?? c.dernier_message_le)}</span>
                       </span>
-                      <span className="truncate text-xs font-semibold text-vert">{sujet?.titre ?? "Annonce indisponible"}</span>
+                      <span className="truncate text-xs font-semibold text-vert">{sujet?.titre ?? "Sujet indisponible"}</span>
                       <span className="flex items-center justify-between gap-2">
                         <span className={`truncate text-[13px] ${n ? "font-semibold text-encre" : "text-gris"}`}>
                           {dernier ? `${dernier.expediteur_id === user.id ? "Toi : " : ""}${dernier.texte}` : "Pas encore de message"}

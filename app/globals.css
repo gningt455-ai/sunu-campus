@@ -21,3 +21,9 @@ body {
   background: var(--color-fond);
   color: var(--color-encre);
 }
+
+/* Barre de chargement (app/loading.tsx) */
+@keyframes chargement {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}

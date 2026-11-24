@@ -6,6 +6,8 @@ import { Alerte, Bouton, Champ } from "@/components/Champ";
 import { compresserImage } from "@/lib/photos";
 import { TYPES_IMAGE } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/client";
+import OptionsLieux from "@/components/ListeLieux";
+import type { Lieu } from "@/lib/lieux";
 
 type Option = { id: string | number; nom: string };
 
@@ -13,7 +15,7 @@ const MAX_PHOTOS = 3;
 const styleChamp =
   "w-full rounded-xl border border-bord bg-white px-3 text-[15px] font-normal text-encre outline-none focus:border-vert focus:ring-2 focus:ring-vert/20";
 
-export default function FormulaireAnnonce({ userId, categories, lieux }: { userId: string; categories: Option[]; lieux: Option[] }) {
+export default function FormulaireAnnonce({ userId, categories, lieux }: { userId: string; categories: Option[]; lieux: Lieu[] }) {
   const router = useRouter();
   const [categorie, setCategorie] = useState<string>("");
   const [photos, setPhotos] = useState<{ fichier: File; apercu: string }[]>([]);
@@ -179,11 +181,7 @@ export default function FormulaireAnnonce({ userId, categories, lieux }: { userI
         Lieu de rencontre sur le campus
         <select name="lieu" className={`${styleChamp} h-12`} defaultValue="">
           <option value="">À convenir</option>
-          {lieux.map((l) => (
-            <option key={l.id} value={l.id}>
-              {l.nom}
-            </option>
-          ))}
+          <OptionsLieux lieux={lieux} />
         </select>
       </label>
 

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import Logo from "@/components/Logo";
+import AlerteCarteTrouvee from "@/components/AlerteCarteTrouvee";
+import { cartesTrouveesPour } from "@/lib/objets";
 import FormulaireCarte from "@/components/FormulaireCarte";
 import { Alerte } from "@/components/Champ";
 import { lireSession } from "@/lib/session";
@@ -33,12 +35,10 @@ export default async function Attente() {
   if (!user || !profil) redirect("/connexion");
   if (profil.statut === "verifie") redirect("/");
 
-  const { data: demande } = await supabase
-    .from("verifications")
-    .select("motif_refus, created_at")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
+  const [{ data: demande }, mesCartes] = await Promise.all([
+    supabase.from("verifications").select("motif_refus, created_at").eq("user_id", user.id).maybeSingle(),
+    cartesTrouveesPour(supabase, profil.prenom, profil.nom),
+  ]);
   const refuse = profil.statut === "refuse";
   const bloque = profil.statut === "bloque";
 
@@ -73,7 +73,7 @@ export default async function Attente() {
               titre="Vérification de la carte"
               texte={refuse ? "Refusée" : demande ? "En cours par l'équipe Sunu Campus" : "Carte pas encore envoyée"}
             />
-            <Etape numero={3} etat="avenir" titre="Compte activé" texte="Accès complet : annonces, messages, logements, mur" />
+            <Etape numero={3} etat="avenir" titre="Compte activé" texte="Accès complet : annonces, messages, objets perdus, messages anonymes" />
           </ol>
 
           {refuse && demande?.motif_refus && <Alerte type="erreur">Motif : {demande.motif_refus}</Alerte>}
@@ -87,6 +87,12 @@ export default async function Attente() {
       {!bloque && (
         <Link href="/annonces" className="flex min-h-[52px] items-center justify-center rounded-xl border border-bord bg-white font-bold">
           Parcourir les annonces en attendant
+        </Link>
+      )}
+      {!bloque && <AlerteCarteTrouvee objets={mesCartes} />}
+      {!bloque && (
+        <Link href="/objets" className="flex min-h-[52px] items-center justify-center rounded-xl border border-bord bg-white font-bold">
+          Carte perdue ? Voir les objets trouvés
         </Link>
       )}
       {!bloque && (

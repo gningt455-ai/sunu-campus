@@ -1,17 +1,15 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import BadgeMessages from "@/components/BadgeMessages";
-import { createClient } from "@/lib/supabase/server";
+import { lireSession } from "@/lib/session";
 
-type Onglet = "accueil" | "annonces" | "campus" | "messages";
+type Onglet = "accueil" | "annonces" | "objets" | "campus" | "messages" | "mur";
 
 // Barre du haut des pages connectées
 export default async function EnTete({ actif, peutPublier = true }: { actif?: Onglet; peutPublier?: boolean }) {
-  // Nombre de messages reçus non lus (la sécurité RLS limite aux conversations de l'étudiant)
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Nombre de messages reçus non lus (la sécurité RLS limite aux conversations de l'étudiant).
+  // lireSession() est mis en cache : aucune vérification supplémentaire.
+  const { supabase, user } = await lireSession();
   let nonLus = 0;
   if (user) {
     const { count } = await supabase
@@ -26,7 +24,7 @@ export default async function EnTete({ actif, peutPublier = true }: { actif?: On
     <Link
       href={href}
       aria-current={actif === cle ? "page" : undefined}
-      className={`inline-flex items-center rounded-lg px-3 py-2 text-sm font-semibold ${actif === cle ? "bg-vert-clair text-vert-fonce" : "text-gris hover:text-encre"}`}
+      className={`inline-flex flex-none items-center rounded-lg px-3 py-2 text-sm font-semibold ${actif === cle ? "bg-vert-clair text-vert-fonce" : "text-gris hover:text-encre"}`}
     >
       {nom}
       {cle === "messages" && user && <BadgeMessages initial={nonLus} moi={user.id} />}
@@ -41,8 +39,9 @@ export default async function EnTete({ actif, peutPublier = true }: { actif?: On
           <span className="hidden sm:contents">
             {lien("/", "Accueil", "accueil")}
             {lien("/annonces", "Annonces", "annonces")}
-            {lien("/campus", "Campus", "campus")}
+            {lien("/objets", "Objets perdus", "objets")}
             {lien("/messages", "Messages", "messages")}
+            {lien("/mur", "Anonyme", "mur")}
           </span>
           {peutPublier && (
             <Link
@@ -55,14 +54,17 @@ export default async function EnTete({ actif, peutPublier = true }: { actif?: On
               Publier
             </Link>
           )}
+          <span className="hidden sm:contents">{lien("/campus", "Campus", "campus")}</span>
         </nav>
       </div>
       {/* Sur téléphone : onglets sous le logo */}
-      <div className="mx-auto flex max-w-5xl gap-1 px-3 pb-2 sm:hidden">
+      <div className="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-3 pb-2 sm:hidden">
         {lien("/", "Accueil", "accueil")}
         {lien("/annonces", "Annonces", "annonces")}
-        {lien("/campus", "Campus", "campus")}
+        {lien("/objets", "Objets perdus", "objets")}
         {lien("/messages", "Messages", "messages")}
+        {lien("/mur", "Anonyme", "mur")}
+        {lien("/campus", "Campus", "campus")}
       </div>
     </header>
   );

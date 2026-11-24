@@ -9,7 +9,7 @@ const jakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: "Sunu Campus",
-  description: "Achat, vente, logements et entraide entre étudiants de l'UCAD",
+  description: "Achat, vente, objets perdus et entraide entre étudiants de l'UCAD",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

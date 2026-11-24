@@ -36,6 +36,11 @@ export default async function Admin() {
 
   const demandes = (data ?? []) as unknown as Demande[];
 
+  const { count: nbSignalements } = await supabase
+    .from("signalements")
+    .select("id", { count: "exact", head: true })
+    .eq("statut", "en_attente");
+
   // Liens temporaires (10 min) vers les photos du bucket privé
   const liens = new Map<string, string>();
   if (demandes.length > 0) {
@@ -58,9 +63,17 @@ export default async function Admin() {
               <span className="block text-2xl font-extrabold">{demandes.length}</span>
               <span className="text-xs font-semibold">Cartes à vérifier</span>
             </div>
+            <Link href="/admin/signalements" className="flex w-fit flex-col justify-center rounded-xl bg-white px-4 py-3 text-encre hover:bg-fond">
+              <span className={`block text-2xl font-extrabold ${nbSignalements ? "text-rouge" : ""}`}>{nbSignalements ?? 0}</span>
+              <span className="text-xs font-semibold">Signalements →</span>
+            </Link>
             <Link href="/admin/campus" className="flex w-fit flex-col justify-center rounded-xl border border-[#3a4a43] bg-[#24332c] px-4 py-3 text-white hover:bg-[#2c3d35]">
               <span className="text-sm font-extrabold">Découvrir le campus →</span>
               <span className="text-xs text-[#b8c4be]">Publier des histoires et des photos</span>
+            </Link>
+            <Link href="/admin/lieux" className="flex w-fit flex-col justify-center rounded-xl border border-[#3a4a43] bg-[#24332c] px-4 py-3 text-white hover:bg-[#2c3d35]">
+              <span className="text-sm font-extrabold">Lieux du campus →</span>
+              <span className="text-xs text-[#b8c4be]">Pavillons, places, restos…</span>
             </Link>
           </div>
         </div>

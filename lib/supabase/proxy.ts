@@ -25,7 +25,8 @@ export async function updateSession(request: NextRequest) {
   );
 
   // Ne rien mettre entre createServerClient et cet appel.
-  await supabase.auth.getUser();
+  // getClaims() rafraîchit la session si besoin et vérifie le jeton localement (rapide).
+  await supabase.auth.getClaims();
 
   return response;
 }

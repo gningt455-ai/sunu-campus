@@ -1,4 +1,4 @@
-// Photos des annonces et logements (bucket public « photos »)
+// Photos des annonces, objets et histoires (bucket public « photos »)
 
 // Adresse publique d'une photo à partir de son chemin dans le bucket
 export function urlPhoto(chemin: string): string {

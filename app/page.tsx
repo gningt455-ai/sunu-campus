@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import Logo from "@/components/Logo";
 import EnTete from "@/components/EnTete";
 import CarteAnnonce, { type ResumeAnnonce } from "@/components/CarteAnnonce";
+import AlerteCarteTrouvee from "@/components/AlerteCarteTrouvee";
+import { cartesTrouveesPour } from "@/lib/objets";
 import { lireSession } from "@/lib/session";
 import { deconnexion } from "@/app/actions";
 
@@ -18,10 +20,10 @@ export default async function Accueil() {
         <Logo />
         <div className="flex flex-col gap-3">
           <h1 className="text-[32px] font-extrabold leading-tight tracking-tight">
-            Achète, vends et trouve un logement entre étudiants de l&apos;UCAD.
+            Achète, vends et retrouve tes objets perdus entre étudiants de l&apos;UCAD.
           </h1>
           <p className="text-[15px] leading-relaxed text-gris">
-            Une plateforme réservée aux étudiants vérifiés : annonces, logements, messagerie, mur anonyme et histoires du campus.
+            Une plateforme réservée aux étudiants vérifiés : annonces, objets perdus, messagerie, messages anonymes et histoires du campus.
           </p>
         </div>
         <div className="flex flex-col gap-3">
@@ -40,7 +42,7 @@ export default async function Accueil() {
   if (profil.statut !== "verifie") redirect("/attente");
 
   // Compte vérifié : accueil avec catégories et dernières annonces
-  const [{ data: categories }, { data: dernieres }] = await Promise.all([
+  const [{ data: categories }, { data: dernieres }, mesCartes] = await Promise.all([
     supabase.from("categories").select("slug, nom").order("ordre"),
     supabase
       .from("annonces")
@@ -48,6 +50,7 @@ export default async function Accueil() {
       .eq("statut", "en_ligne")
       .order("created_at", { ascending: false })
       .limit(8),
+    cartesTrouveesPour(supabase, profil.prenom, profil.nom),
   ]);
   const annonces = (dernieres ?? []) as unknown as ResumeAnnonce[];
 
@@ -62,6 +65,8 @@ export default async function Accueil() {
           </span>
           <h1 className="text-[26px] font-extrabold leading-tight tracking-tight">Salut {profil.prenom}, tu cherches quoi aujourd&apos;hui ?</h1>
         </div>
+
+        <AlerteCarteTrouvee objets={mesCartes} />
 
         <form action="/annonces" className="flex gap-2">
           <label className="flex h-12 flex-1 items-center gap-2 rounded-xl border border-[#e1e5e2] bg-white px-3">
@@ -82,13 +87,22 @@ export default async function Accueil() {
           ))}
         </div>
 
-        <Link href="/campus" className="flex items-center justify-between gap-4 rounded-2xl bg-encre p-5 text-white">
-          <span className="flex flex-col gap-1">
-            <span className="text-[11px] font-bold uppercase tracking-wide text-jaune">Découvrir le campus</span>
-            <span className="text-lg font-extrabold leading-snug">La beauté de l&apos;UCAD et du campus social, en photos et en histoires</span>
-          </span>
-          <span aria-hidden="true" className="text-2xl">→</span>
-        </Link>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Link href="/objets" className="flex items-center justify-between gap-4 rounded-2xl bg-vert p-5 text-white">
+            <span className="flex flex-col gap-1">
+              <span className="text-[11px] font-bold uppercase tracking-wide text-jaune">Objets perdus</span>
+              <span className="text-lg font-extrabold leading-snug">Carte étudiant perdue ? Vérifie si quelqu&apos;un l&apos;a trouvée</span>
+            </span>
+            <span aria-hidden="true" className="text-2xl">→</span>
+          </Link>
+          <Link href="/campus" className="flex items-center justify-between gap-4 rounded-2xl bg-encre p-5 text-white">
+            <span className="flex flex-col gap-1">
+              <span className="text-[11px] font-bold uppercase tracking-wide text-jaune">Découvrir le campus</span>
+              <span className="text-lg font-extrabold leading-snug">La beauté de l&apos;UCAD et du campus social</span>
+            </span>
+            <span aria-hidden="true" className="text-2xl">→</span>
+          </Link>
+        </div>
 
         <section className="flex flex-col gap-3">
           <div className="flex items-baseline justify-between">
