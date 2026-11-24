@@ -17,6 +17,14 @@
   --font-sans: var(--font-jakarta);
 }
 
+html,
+body {
+  /* Sur téléphone : la page ne doit jamais être plus large que l'écran.
+     « clip » (et non « hidden ») garde l'en-tête collant en haut. */
+  overflow-x: clip;
+  max-width: 100%;
+}
+
 body {
   background: var(--color-fond);
   color: var(--color-encre);

@@ -32,7 +32,7 @@ export default async function EnTete({ actif, peutPublier = true }: { actif?: On
   );
 
   return (
-    <header className="sticky top-0 z-10 border-b border-[#e1e5e2] bg-fond/95 backdrop-blur">
+    <header className="sticky top-0 z-10 w-full min-w-0 border-b border-[#e1e5e2] bg-fond/95 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
         <Logo />
         <nav className="flex items-center gap-1">

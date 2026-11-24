@@ -51,7 +51,7 @@ export default async function MessagesAnonymes({ searchParams }: { searchParams:
       <EnTete actif="mur" />
 
       {/* Bandeau d'accueil */}
-      <section className="bg-encre text-white">
+      <section className="w-full min-w-0 bg-encre text-white">
         <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-7">
           <div className="flex items-center gap-3">
             <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-jaune text-encre">
