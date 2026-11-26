@@ -22,21 +22,17 @@ export default function ImageApercu() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-          <div
-            style={{
-              width: 96,
-              height: 96,
-              borderRadius: 24,
-              background: "#f4b400",
-              color: "#14201b",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 44,
-              fontWeight: 800,
-            }}
-          >
-            SC
+          <div style={{ display: "flex", padding: 6, borderRadius: 30, background: "#ffffff" }}>
+            <svg width="96" height="96" viewBox="0 0 48 48">
+              <rect width="48" height="48" rx="12" fill="#0e6b4e" />
+              <circle cx="24" cy="19" r="8" fill="#f4b400" />
+              <path d="M8 24 24 15l16 9z" fill="#fff" />
+              <rect x="12" y="26" width="3.2" height="9" fill="#fff" />
+              <rect x="18.5" y="26" width="3.2" height="9" fill="#fff" />
+              <rect x="26.3" y="26" width="3.2" height="9" fill="#fff" />
+              <rect x="32.8" y="26" width="3.2" height="9" fill="#fff" />
+              <rect x="9" y="36" width="30" height="3" rx="1" fill="#fff" />
+            </svg>
           </div>
           <div style={{ fontSize: 52, fontWeight: 800 }}>Sunu Campus</div>
         </div>
