@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { TYPES_LIEU, lieuxParType, type Lieu } from "@/lib/lieux";
 
 // Choix du lieu de rencontre : boutons pour les lieux courants, recherche pour les autres.
-// La valeur choisie est envoyée dans un champ caché nommé "lieu" ("" = lieu à discuter par message).
+// La valeur choisie est envoyée dans un champ caché nommé "lieu" ("" = lieu à voir ensemble).
 
 function normaliser(t: string) {
   return t
@@ -15,6 +15,8 @@ function normaliser(t: string) {
 
 export default function ChoixLieu({ lieux, populaires, initial = "" }: { lieux: Lieu[]; populaires: string[]; initial?: string }) {
   const [choix, setChoix] = useState(initial);
+  // Case « Lieu à voir ensemble » : quand elle est cochée, aucun lieu ne peut être choisi
+  const [aVoir, setAVoir] = useState(false);
   const [recherche, setRecherche] = useState("");
   const [tout, setTout] = useState(false);
 
@@ -26,9 +28,11 @@ export default function ChoixLieu({ lieux, populaires, initial = "" }: { lieux: 
   if (lieuChoisi && !boutons.some((l) => l.id === lieuChoisi.id)) boutons.unshift(lieuChoisi);
 
   // Recherche par nom ou par type (« pav » → pavillons, « fac » → facultés)
+  const enBouton = new Set(populaires);
+  const autresLieux = lieux.filter((l) => !enBouton.has(l.id));
   const q = normaliser(recherche.trim());
   const resultats = q
-    ? lieux
+    ? autresLieux
         .filter((l) => normaliser(l.nom).includes(q) || normaliser(TYPES_LIEU[l.type]).includes(q))
         .sort((a, b) => a.nom.localeCompare(b.nom, "fr", { numeric: true }))
     : [];
@@ -58,14 +62,27 @@ export default function ChoixLieu({ lieux, populaires, initial = "" }: { lieux: 
   return (
     <fieldset className="flex flex-col gap-2.5">
       <legend className="mb-2 text-[13px] font-semibold">Lieu de rencontre sur le campus</legend>
-      <input type="hidden" name="lieu" value={choix} />
+      <input type="hidden" name="lieu" value={aVoir ? "" : choix} />
+
+      <label className="flex min-h-[48px] cursor-pointer items-center gap-3 rounded-xl border border-bord bg-white px-3 text-[14px] font-semibold">
+        <input
+          type="checkbox"
+          checked={aVoir}
+          onChange={(e) => {
+            setAVoir(e.target.checked);
+            setRecherche("");
+            setTout(false);
+          }}
+          className="h-5 w-5 accent-[#0e6b4e]"
+        />
+        Lieu à voir ensemble
+      </label>
+
+      <div className={`flex flex-col gap-2.5 ${aVoir ? "pointer-events-none opacity-40" : ""}`} aria-disabled={aVoir}>
 
       <div className="flex flex-wrap gap-2">
-        <button type="button" aria-pressed={choix === ""} onClick={() => choisir("")} className={puce(choix === "")}>
-          On en discute par message
-        </button>
         {boutons.map((l) => (
-          <button key={l.id} type="button" aria-pressed={choix === l.id} onClick={() => choisir(l.id)} className={puce(choix === l.id)}>
+          <button key={l.id} type="button" disabled={aVoir} aria-pressed={!aVoir && choix === l.id} onClick={() => choisir(l.id)} className={puce(!aVoir && choix === l.id)}>
             {l.nom}
           </button>
         ))}
@@ -81,6 +98,7 @@ export default function ChoixLieu({ lieux, populaires, initial = "" }: { lieux: 
           type="search"
           value={recherche}
           onChange={(e) => setRecherche(e.target.value)}
+          disabled={aVoir}
           placeholder="Autre lieu : pavillon, fac, resto…"
           className="min-w-0 flex-1 bg-transparent text-[15px] outline-none"
         />
@@ -89,7 +107,7 @@ export default function ChoixLieu({ lieux, populaires, initial = "" }: { lieux: 
       {q && (
         <ul className="max-h-72 overflow-y-auto rounded-xl border border-bord bg-white py-1">
           {resultats.length === 0 ? (
-            <li className="px-3 py-3 text-[13px] text-gris">Aucun lieu trouvé. Choisis « On en discute par message ».</li>
+            <li className="px-3 py-3 text-[13px] text-gris">Aucun lieu trouvé. Coche « Lieu à voir ensemble ».</li>
           ) : (
             resultats.map((l) => ligneLieu(l, true))
           )}
@@ -103,7 +121,7 @@ export default function ChoixLieu({ lieux, populaires, initial = "" }: { lieux: 
       )}
       {!q && tout && (
         <div className="max-h-80 overflow-y-auto rounded-xl border border-bord bg-white py-1">
-          {lieuxParType(lieux).map((g) => (
+          {lieuxParType(autresLieux).map((g) => (
             <div key={g.type}>
               <p className="px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wide text-gris">{g.titre}</p>
               <ul>{g.lieux.map((l) => ligneLieu(l, false))}</ul>
@@ -111,6 +129,7 @@ export default function ChoixLieu({ lieux, populaires, initial = "" }: { lieux: 
           ))}
         </div>
       )}
+      </div>
     </fieldset>
   );
 }
