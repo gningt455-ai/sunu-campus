@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sunu-campus.vercel.app";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.sunucampus.com";
 
 // Google peut visiter les pages publiques. Les pages réservées aux étudiants
 // connectés (annonces, messages, admin…) n'ont rien à indexer.

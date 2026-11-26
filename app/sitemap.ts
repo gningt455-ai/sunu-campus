@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sunu-campus.vercel.app";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.sunucampus.com";
 
 // Plan du site pour Google : uniquement les pages publiques
 export default function sitemap(): MetadataRoute.Sitemap {
