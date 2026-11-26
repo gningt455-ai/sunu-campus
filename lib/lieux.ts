@@ -20,3 +20,23 @@ export function lieuxParType(lieux: Lieu[]): { type: TypeLieu; titre: string; li
     }))
     .filter((g) => g.lieux.length > 0);
 }
+
+// Lieux de rencontre proposés en boutons : les plus utilisés dans les annonces récentes,
+// complétés par des lieux connus de tous (Couloir de la mort, Place Omar Pène, bibliothèque…)
+const LIEUX_PAR_DEFAUT = ["couloir de la mort", "omar pene", "biblioth", "resto"];
+
+export function lieuxPopulaires(lieux: Lieu[], lieuxUtilises: string[], nombre = 6): string[] {
+  const existe = new Set(lieux.map((l) => l.id));
+  const compte = new Map<string, number>();
+  for (const id of lieuxUtilises) if (existe.has(id)) compte.set(id, (compte.get(id) ?? 0) + 1);
+
+  const choisis = [...compte.entries()].sort((a, b) => b[1] - a[1]).map(([id]) => id);
+
+  const sansAccent = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  for (const mot of LIEUX_PAR_DEFAUT) {
+    if (choisis.length >= nombre) break;
+    const l = lieux.find((x) => sansAccent(x.nom).includes(mot) && !choisis.includes(x.id));
+    if (l) choisis.push(l.id);
+  }
+  return choisis.slice(0, nombre);
+}

@@ -6,7 +6,7 @@ import { Alerte, Bouton, Champ } from "@/components/Champ";
 import { compresserImage } from "@/lib/photos";
 import { TYPES_IMAGE } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/client";
-import OptionsLieux from "@/components/ListeLieux";
+import ChoixLieu from "@/components/ChoixLieu";
 import type { Lieu } from "@/lib/lieux";
 
 type Option = { id: string | number; nom: string };
@@ -15,7 +15,19 @@ const MAX_PHOTOS = 3;
 const styleChamp =
   "w-full rounded-xl border border-bord bg-white px-3 text-[15px] font-normal text-encre outline-none focus:border-vert focus:ring-2 focus:ring-vert/20";
 
-export default function FormulaireAnnonce({ userId, categories, lieux }: { userId: string; categories: Option[]; lieux: Lieu[] }) {
+export default function FormulaireAnnonce({
+  userId,
+  categories,
+  lieux,
+  lieuxPopulaires,
+  dernierLieu,
+}: {
+  userId: string;
+  categories: Option[];
+  lieux: Lieu[];
+  lieuxPopulaires: string[];
+  dernierLieu: string;
+}) {
   const router = useRouter();
   const [categorie, setCategorie] = useState<string>("");
   const [photos, setPhotos] = useState<{ fichier: File; apercu: string }[]>([]);
@@ -177,13 +189,7 @@ export default function FormulaireAnnonce({ userId, categories, lieux }: { userI
         <textarea name="description" rows={4} maxLength={2000} placeholder="État, détails utiles, ce qui est inclus…" className={`${styleChamp} resize-none py-3`} />
       </label>
 
-      <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
-        Lieu de rencontre sur le campus
-        <select name="lieu" className={`${styleChamp} h-12`} defaultValue="">
-          <option value="">À convenir</option>
-          <OptionsLieux lieux={lieux} />
-        </select>
-      </label>
+      <ChoixLieu lieux={lieux} populaires={lieuxPopulaires} initial={dernierLieu} />
 
       <p className="text-xs leading-relaxed text-gris">
         Interdit : armes, médicaments, produits illicites, codifications. Les annonces signalées sont vérifiées par l&apos;équipe.
