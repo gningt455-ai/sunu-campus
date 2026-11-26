@@ -4,7 +4,7 @@ import { useEffect, useId, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 // Pastille rouge : nombre de messages reçus non lus, mise à jour en temps réel
-export default function BadgeMessages({ initial, moi }: { initial: number; moi: string }) {
+export default function BadgeMessages({ initial, moi, className }: { initial: number; moi: string; className?: string }) {
   const supabase = useMemo(() => createClient(), []);
   const idCanal = useId();
   const [nombre, setNombre] = useState(initial);
@@ -34,7 +34,7 @@ export default function BadgeMessages({ initial, moi }: { initial: number; moi: 
   return (
     <span
       aria-label={`${nombre} message${nombre > 1 ? "s" : ""} non lu${nombre > 1 ? "s" : ""}`}
-      className="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rouge px-1.5 text-[11px] font-bold leading-none text-white"
+      className={className ?? "ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rouge px-1.5 text-[11px] font-bold leading-none text-white"}
     >
       {nombre > 99 ? "99+" : nombre}
     </span>

@@ -35,3 +35,10 @@ body {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(300%); }
 }
+
+/* Téléphone : laisse la place à la barre d'onglets fixée en bas */
+@media (max-width: 639px) {
+  body:has(.nav-bas) {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  }
+}

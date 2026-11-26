@@ -79,7 +79,7 @@ export default async function Accueil() {
           </label>
         </form>
 
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex flex-wrap gap-2">
           {categories?.map((c) => (
             <Link key={c.slug} href={`/annonces?categorie=${c.slug}`} className="flex-none rounded-full border border-bord bg-white px-4 py-2 text-[13px] font-semibold">
               {c.nom}

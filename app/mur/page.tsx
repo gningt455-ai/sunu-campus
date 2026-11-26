@@ -125,7 +125,7 @@ export default async function MessagesAnonymes({ searchParams }: { searchParams:
         </div>
 
         {/* Catégories */}
-        <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Catégories">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Catégories">
           <Link
             href={lien(populaires, null)}
             className={`flex-none rounded-full border px-4 py-2 text-[13px] font-semibold ${!categorie ? "border-encre bg-encre text-white" : "border-bord bg-white"}`}

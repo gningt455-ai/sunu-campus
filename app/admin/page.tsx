@@ -1,3 +1,4 @@
+import LectureCarte from "@/components/LectureCarte";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { lireSession } from "@/lib/session";
@@ -113,6 +114,8 @@ export default async function Admin() {
                   <span className="text-sm text-gris">N° de carte : {d.numero_carte}</span>
                   <span className="text-xs text-gris">Envoyée {ilYa(d.updated_at)}</span>
                 </div>
+
+                {lien && <LectureCarte url={lien} numero={d.numero_carte} prenom={d.profiles?.prenom ?? ""} nom={d.profiles?.nom ?? ""} />}
 
                 <form className="flex flex-col gap-2">
                   <input type="hidden" name="user_id" value={d.user_id} />

@@ -50,6 +50,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#0e6b4e",
+  // Permet de respecter la barre du bas de l'iPhone (safe-area)
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

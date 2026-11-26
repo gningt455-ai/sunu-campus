@@ -86,7 +86,7 @@ export default async function ObjetsPerdus({ searchParams }: { searchParams: Fil
           <button className="h-12 rounded-xl bg-vert px-4 text-sm font-bold text-white">Chercher</button>
         </form>
 
-        <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Catégories">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Catégories">
           <Link href={lien(sens, null)} className={puce(!categorie)}>
             Tout
           </Link>

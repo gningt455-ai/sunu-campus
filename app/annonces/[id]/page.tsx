@@ -68,7 +68,8 @@ export default async function DetailAnnonce({
           <Link href="/annonces" className="text-sm font-semibold text-gris hover:text-encre">
             ← Retour aux annonces
           </Link>
-          <div className="flex snap-x snap-mandatory overflow-x-auto rounded-2xl bg-[#dde7e1]">
+          <div className="relative">
+          <div className={`flex snap-x snap-mandatory overflow-x-auto rounded-2xl bg-[#dde7e1] ${a.statut === "vendue" ? "grayscale" : ""}`}>
             {a.photos.length === 0 ? (
               <div className="flex aspect-[4/3] w-full flex-none items-center justify-center text-sm text-gris">Pas de photo</div>
             ) : (
@@ -78,12 +79,22 @@ export default async function DetailAnnonce({
               ))
             )}
           </div>
+          {a.statut === "vendue" && (
+            <span className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-2xl bg-encre/35">
+              <span className="-rotate-12 rounded-lg border-4 border-white bg-rouge px-6 py-2 text-3xl font-extrabold tracking-[0.2em] text-white shadow-lg">
+                VENDU
+              </span>
+            </span>
+          )}
+          </div>
           {a.photos.length > 1 && <p className="text-center text-xs text-gris">Fais glisser pour voir les {a.photos.length} photos</p>}
         </section>
 
         <section className="flex flex-col gap-5">
           {signale && <Alerte type="succes">Merci, ton signalement a été envoyé à l&apos;équipe de modération.</Alerte>}
-          {a.statut === "vendue" && <Alerte type="info">Cette annonce est marquée comme vendue.</Alerte>}
+          {a.statut === "vendue" && (
+            <Alerte type="info">{estAMoi ? "Tu as marqué cette annonce comme vendue. Elle reste visible 14 jours avec le bandeau VENDU." : "Cet article a déjà été vendu."}</Alerte>
+          )}
           {a.statut === "masquee" && <Alerte type="erreur">Cette annonce a été masquée par la modération.</Alerte>}
 
           <div className="flex flex-col gap-2">
@@ -96,7 +107,7 @@ export default async function DetailAnnonce({
               <span className="rounded-lg bg-gris-clair px-2.5 py-1 text-xs font-bold text-[#36423d]">{a.etat === "neuf" ? "Neuf" : "Occasion"}</span>
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight">{a.titre}</h1>
-            <p className="text-[26px] font-extrabold text-vert">{formatPrix(a.prix)}</p>
+            <p className={`text-[26px] font-extrabold ${a.statut === "vendue" ? "text-gris line-through" : "text-vert"}`}>{formatPrix(a.prix)}</p>
             <p className="text-xs text-gris">Publiée {ilYa(a.created_at)}</p>
           </div>
 
@@ -143,7 +154,11 @@ export default async function DetailAnnonce({
           ) : (
             <div className="flex flex-col gap-3">
               <div className="flex gap-2">
-                {verifie ? (
+                {a.statut === "vendue" ? (
+                  <button disabled className="min-h-[52px] flex-1 cursor-not-allowed rounded-xl bg-gris-clair font-bold text-gris">
+                    Article déjà vendu
+                  </button>
+                ) : verifie ? (
                   <form action={ouvrirConversation.bind(null, a.id)} className="flex-1">
                     <button className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-vert font-bold text-white hover:bg-vert-fonce">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

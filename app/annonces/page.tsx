@@ -9,6 +9,11 @@ export const dynamic = "force-dynamic";
 
 type Filtres = Promise<{ categorie?: string; q?: string; lieu?: string }>;
 
+// Date d'il y a 14 jours (les annonces vendues restent affichées pendant ce temps)
+function depuis14Jours() {
+  return new Date(Date.now() - 14 * 24 * 3600 * 1000).toISOString();
+}
+
 export default async function Annonces({ searchParams }: { searchParams: Filtres }) {
   const { supabase, user, profil } = await lireSession();
   if (!user || !profil) redirect("/connexion");
@@ -27,7 +32,9 @@ export default async function Annonces({ searchParams }: { searchParams: Filtres
   let requete = supabase
     .from("annonces")
     .select("id, titre, prix, etat, statut, photos, lieux(nom, nom_court)")
-    .eq("statut", "en_ligne")
+    // Les annonces disponibles d'abord, puis celles vendues ces 14 derniers jours (bandeau VENDU)
+    .or(`statut.eq.en_ligne,and(statut.eq.vendue,updated_at.gte.${depuis14Jours()})`)
+    .order("statut", { ascending: true })
     .order("created_at", { ascending: false })
     .limit(60);
   if (catActive) requete = requete.eq("categorie_id", catActive.id);
@@ -36,6 +43,7 @@ export default async function Annonces({ searchParams }: { searchParams: Filtres
 
   const { data } = await requete;
   const annonces = (data ?? []) as unknown as ResumeAnnonce[];
+  const disponibles = annonces.filter((a) => a.statut !== "vendue").length;
 
   const lienFiltre = (slug?: string) => {
     const p = new URLSearchParams();
@@ -78,7 +86,7 @@ export default async function Annonces({ searchParams }: { searchParams: Filtres
           <button className="h-12 rounded-xl bg-vert px-4 text-sm font-bold text-white">Chercher</button>
         </form>
 
-        <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Catégories">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Catégories">
           <Link href={lienFiltre()} className={puce(!catActive)} aria-current={!catActive ? "page" : undefined}>
             Tout
           </Link>
@@ -90,7 +98,7 @@ export default async function Annonces({ searchParams }: { searchParams: Filtres
         </div>
 
         <p className="text-[13px] text-gris">
-          {annonces.length} annonce{annonces.length > 1 ? "s" : ""}
+          {disponibles} annonce{disponibles > 1 ? "s" : ""} disponible{disponibles > 1 ? "s" : ""}
           {recherche ? ` pour « ${recherche} »` : ""}
         </p>
 
