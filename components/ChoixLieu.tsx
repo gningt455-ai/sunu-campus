@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { TYPES_LIEU, lieuxParType, type Lieu } from "@/lib/lieux";
 
 // Choix du lieu de rencontre : boutons pour les lieux courants, recherche pour les autres.
-// La valeur choisie est envoyée dans un champ caché nommé "lieu" ("" = à convenir).
+// La valeur choisie est envoyée dans un champ caché nommé "lieu" ("" = lieu à discuter par message).
 
 function normaliser(t: string) {
   return t
@@ -62,7 +62,7 @@ export default function ChoixLieu({ lieux, populaires, initial = "" }: { lieux: 
 
       <div className="flex flex-wrap gap-2">
         <button type="button" aria-pressed={choix === ""} onClick={() => choisir("")} className={puce(choix === "")}>
-          À convenir
+          On en discute par message
         </button>
         {boutons.map((l) => (
           <button key={l.id} type="button" aria-pressed={choix === l.id} onClick={() => choisir(l.id)} className={puce(choix === l.id)}>
@@ -89,7 +89,7 @@ export default function ChoixLieu({ lieux, populaires, initial = "" }: { lieux: 
       {q && (
         <ul className="max-h-72 overflow-y-auto rounded-xl border border-bord bg-white py-1">
           {resultats.length === 0 ? (
-            <li className="px-3 py-3 text-[13px] text-gris">Aucun lieu trouvé. Choisis « À convenir » et précise le lieu par message.</li>
+            <li className="px-3 py-3 text-[13px] text-gris">Aucun lieu trouvé. Choisis « On en discute par message ».</li>
           ) : (
             resultats.map((l) => ligneLieu(l, true))
           )}
