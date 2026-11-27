@@ -1,3 +1,4 @@
+import { libelleEtat, type Disponibilite } from "@/lib/annonces";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import EnTete from "@/components/EnTete";
@@ -16,6 +17,7 @@ type Annonce = {
   description: string | null;
   prix: number;
   etat: "neuf" | "occasion";
+  disponibilite: Disponibilite | null;
   statut: "en_ligne" | "vendue" | "masquee";
   photos: string[];
   created_at: string;
@@ -43,7 +45,7 @@ export default async function DetailAnnonce({
 
   const { data } = await supabase
     .from("annonces")
-    .select("id, auteur_id, titre, description, prix, etat, statut, photos, created_at, categories(nom, slug), lieux(nom, description), profiles(prenom, nom, faculte, niveau, statut)")
+    .select("id, auteur_id, titre, description, prix, etat, disponibilite, statut, photos, created_at, categories(nom, slug), lieux(nom, description), profiles(prenom, nom, faculte, niveau, statut)")
     .eq("id", id)
     .maybeSingle();
   if (!data) notFound();
@@ -104,7 +106,9 @@ export default async function DetailAnnonce({
                   {a.categories.nom}
                 </Link>
               )}
-              <span className="rounded-lg bg-gris-clair px-2.5 py-1 text-xs font-bold text-[#36423d]">{a.etat === "neuf" ? "Neuf" : "Occasion"}</span>
+              {libelleEtat(a) && (
+                <span className="rounded-lg bg-gris-clair px-2.5 py-1 text-xs font-bold text-[#36423d]">{libelleEtat(a)}</span>
+              )}
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight">{a.titre}</h1>
             <p className={`text-[26px] font-extrabold ${a.statut === "vendue" ? "text-gris line-through" : "text-vert"}`}>{formatPrix(a.prix)}</p>

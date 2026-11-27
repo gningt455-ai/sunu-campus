@@ -8,8 +8,9 @@ import { TYPES_IMAGE } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/client";
 import ChoixLieu from "@/components/ChoixLieu";
 import type { Lieu } from "@/lib/lieux";
+import { CATEGORIES_SANS_ETAT, DISPONIBILITES } from "@/lib/annonces";
 
-type Option = { id: string | number; nom: string };
+type Option = { id: string | number; nom: string; slug: string };
 
 const MAX_PHOTOS = 3;
 const styleChamp =
@@ -34,6 +35,11 @@ export default function FormulaireAnnonce({
   const [erreur, setErreur] = useState<string | null>(null);
   const [etape, setEtape] = useState<string | null>(null);
 
+  // Le champ « État » est caché pour l'alimentation et les services ; l'alimentation a « Disponible »
+  const slug = categories.find((c) => String(c.id) === categorie)?.slug ?? "";
+  const avecEtat = !CATEGORIES_SANS_ETAT.includes(slug);
+  const estAlimentation = slug === "alimentation";
+
   function ajouterPhotos(fichiers: FileList | null) {
     if (!fichiers) return;
     const valides = Array.from(fichiers).filter((f) => TYPES_IMAGE.includes(f.type));
@@ -49,7 +55,8 @@ export default function FormulaireAnnonce({
     const titre = String(f.get("titre") ?? "").trim();
     const description = String(f.get("description") ?? "").trim();
     const prixTexte = String(f.get("prix") ?? "").replace(/\s/g, "");
-    const etat = String(f.get("etat") ?? "occasion");
+    const etat = avecEtat ? String(f.get("etat") ?? "occasion") : "occasion";
+    const disponibilite = estAlimentation ? String(f.get("disponibilite") ?? "tous_les_jours") : null;
     const lieuId = String(f.get("lieu") ?? "");
 
     if (titre.length < 3) return setErreur("Donne un titre à ton annonce (3 caractères minimum).");
@@ -81,6 +88,7 @@ export default function FormulaireAnnonce({
           description: description || null,
           prix: Number(prixTexte),
           etat,
+          disponibilite,
           categorie_id: Number(categorie),
           lieu_id: lieuId || null,
           photos: chemins,
@@ -173,16 +181,31 @@ export default function FormulaireAnnonce({
         </div>
       </fieldset>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className={avecEtat || estAlimentation ? "grid grid-cols-2 gap-3" : "grid grid-cols-1 gap-3"}>
         <Champ label="Prix (FCFA)" name="prix" inputMode="numeric" placeholder="3000" />
-        <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
-          État
-          <select name="etat" className={`${styleChamp} h-12`} defaultValue="occasion">
-            <option value="occasion">Occasion</option>
-            <option value="neuf">Neuf</option>
-          </select>
-        </label>
+        {estAlimentation ? (
+          <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
+            Disponible
+            <select name="disponibilite" className={`${styleChamp} h-12`} defaultValue="tous_les_jours">
+              <option value="tous_les_jours">{DISPONIBILITES.tous_les_jours}</option>
+              <option value="aujourdhui">{DISPONIBILITES.aujourdhui}</option>
+            </select>
+          </label>
+        ) : (
+          avecEtat && (
+            <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
+              État
+              <select name="etat" className={`${styleChamp} h-12`} defaultValue="occasion">
+                <option value="occasion">Occasion</option>
+                <option value="neuf">Neuf</option>
+              </select>
+            </label>
+          )
+        )}
       </div>
+      {estAlimentation && (
+        <p className="-mt-3 text-xs text-gris">« Aujourd&apos;hui seulement » : ton annonce disparaît de la liste après 24 heures.</p>
+      )}
 
       <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
         Description

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import EnTete from "@/components/EnTete";
+import { offreDuJourExpiree } from "@/lib/annonces";
 import CarteAnnonce, { type ResumeAnnonce } from "@/components/CarteAnnonce";
 import { lireSession } from "@/lib/session";
 import { estUuid } from "@/lib/format";
@@ -31,7 +32,7 @@ export default async function Annonces({ searchParams }: { searchParams: Filtres
 
   let requete = supabase
     .from("annonces")
-    .select("id, titre, prix, etat, statut, photos, lieux(nom, nom_court)")
+    .select("id, titre, prix, etat, disponibilite, statut, photos, created_at, categories(slug), lieux(nom, nom_court)")
     // Les annonces disponibles d'abord, puis celles vendues ces 14 derniers jours (bandeau VENDU)
     .or(`statut.eq.en_ligne,and(statut.eq.vendue,updated_at.gte.${depuis14Jours()})`)
     .order("statut", { ascending: true })
@@ -42,7 +43,8 @@ export default async function Annonces({ searchParams }: { searchParams: Filtres
   if (lieuActif) requete = requete.eq("lieu_id", lieuActif.id);
 
   const { data } = await requete;
-  const annonces = (data ?? []) as unknown as ResumeAnnonce[];
+  // Les offres de nourriture « aujourd'hui seulement » disparaissent des listes après 24 h
+  const annonces = ((data ?? []) as unknown as ResumeAnnonce[]).filter((a) => !offreDuJourExpiree(a));
   const disponibles = annonces.filter((a) => a.statut !== "vendue").length;
 
   const lienFiltre = (slug?: string) => {

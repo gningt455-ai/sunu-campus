@@ -12,7 +12,7 @@ export default async function NouvelleAnnonce() {
   if (profil.statut !== "verifie") redirect("/attente");
 
   const [{ data: categories }, { data: lieux }, { data: dernier }] = await Promise.all([
-    supabase.from("categories").select("id, nom").order("ordre"),
+    supabase.from("categories").select("id, nom, slug").order("ordre"),
     supabase.from("lieux").select("id, nom, type"),
     // Dernier lieu choisi par l'étudiant (proposé par défaut)
     supabase.from("annonces").select("lieu_id").eq("auteur_id", user.id).not("lieu_id", "is", null).order("created_at", { ascending: false }).limit(1).maybeSingle(),

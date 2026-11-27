@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import Logo from "@/components/Logo";
 import EnTete from "@/components/EnTete";
+import { offreDuJourExpiree } from "@/lib/annonces";
 import CarteAnnonce, { type ResumeAnnonce } from "@/components/CarteAnnonce";
 import AlerteCarteTrouvee from "@/components/AlerteCarteTrouvee";
 import { cartesTrouveesPour } from "@/lib/objets";
@@ -46,13 +47,14 @@ export default async function Accueil() {
     supabase.from("categories").select("slug, nom").order("ordre"),
     supabase
       .from("annonces")
-      .select("id, titre, prix, etat, statut, photos, lieux(nom, nom_court)")
+      .select("id, titre, prix, etat, disponibilite, statut, photos, created_at, categories(slug), lieux(nom, nom_court)")
       .eq("statut", "en_ligne")
       .order("created_at", { ascending: false })
       .limit(8),
     cartesTrouveesPour(supabase, profil.prenom, profil.nom),
   ]);
-  const annonces = (dernieres ?? []) as unknown as ResumeAnnonce[];
+  // Les offres de nourriture « aujourd'hui seulement » disparaissent des listes après 24 h
+  const annonces = ((dernieres ?? []) as unknown as ResumeAnnonce[]).filter((a) => !offreDuJourExpiree(a));
 
   return (
     <>
